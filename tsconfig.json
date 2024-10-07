@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    // ... 他の設定 ...
+    "baseUrl": ".",
+    "paths": {
+      "@share/*": ["../share/*"]
+    }
+  }
+}
