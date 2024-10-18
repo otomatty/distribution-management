@@ -34,5 +34,6 @@ dist-ssr
 Thumbs.db
 
 # 環境変数ファイル
+client/web/.env
 .env
 .dev.vars

@@ -1,30 +1,29 @@
-import React from 'react';
-import { Box } from '@mui/material';
-import Hero from './components/Hero/Hero';
-import Concepts from './components/Concepts/Concepts';
-import Features from './components/Features/Features';
-import Benefits from './components/Benefits/Benefits';
-import UseCases from './components/UseCases/UseCases';
-import Testimonials from './components/Testimonials/Testimonials';
-import GettingStarted from './components/GettingStarted/GettingStarted';
-import Faq from './components/Faq/Faq';
-import Community from './components/Community/Community';
-import Newsletter from './components/Newsletter/Newsletter';
+import React from "react";
+import HeroSection from "./components/HeroSection";
+import KeyFeaturesHighlight from "./components/KeyFeaturesHighlight";
+import ProblemSolutionSection from "./components/ProblemSolutionSection";
+import UseCases from "./components/UseCases";
+import StatisticsAndBenefits from "./components/StatisticsAndBenefits";
+import Testimonials from "./components/Testimonials";
+import PlanComparison from "./components/PlanComparison";
+import FAQ from "./components/Faq";
+import ContactSection from "./components/ContactSection";
+import NewsUpdates from "./components/NewsUpdates";
 
 const HomePage: React.FC = () => {
   return (
-    <Box>
-      <Hero />
-      <Concepts />
-      <Features />
-      <Benefits />
+    <>
+      <HeroSection />
+      <KeyFeaturesHighlight />
+      <ProblemSolutionSection />
       <UseCases />
+      <StatisticsAndBenefits />
       <Testimonials />
-      <GettingStarted />
-      <Faq />
-      <Community />
-      <Newsletter />
-    </Box>
+      <PlanComparison />
+      <FAQ />
+      <ContactSection />
+      <NewsUpdates />
+    </>
   );
 };
 

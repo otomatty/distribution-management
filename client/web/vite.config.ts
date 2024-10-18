@@ -1,12 +1,19 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
+import path from "path";
+import react from "@vitejs/plugin-react-swc";
+import { defineConfig } from "vite";
+import tailwindcss from "tailwindcss";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  define: {
-    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
-    'import.meta.env.VITE_NODE_ENV': JSON.stringify(process.env.VITE_NODE_ENV),
-    // 他の環境変数...
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+
+  css: {
+    postcss: {
+      plugins: [tailwindcss],
+    },
   },
 });

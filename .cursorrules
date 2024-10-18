@@ -44,7 +44,8 @@
 
 - スタイリング:
 
-    - MUIを使用する
+    - スタイリングにはTailwind CSSを使用する
+    - UIコンポーネントにはshadcn/uiを使用する
     - カラーはテーマを使用して管理する
     - フォントはNoto Sans Japaneseを使用する
 
