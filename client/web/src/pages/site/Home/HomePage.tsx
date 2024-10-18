@@ -6,7 +6,7 @@ import UseCases from "./components/UseCases";
 import StatisticsAndBenefits from "./components/StatisticsAndBenefits";
 import Testimonials from "./components/Testimonials";
 import PlanComparison from "./components/PlanComparison";
-import FAQ from "./components/Faq";
+import Faq from "./components/Faq";
 import ContactSection from "./components/ContactSection";
 import NewsUpdates from "./components/NewsUpdates";
 
@@ -20,7 +20,7 @@ const HomePage: React.FC = () => {
       <StatisticsAndBenefits />
       <Testimonials />
       <PlanComparison />
-      <FAQ />
+      <Faq />
       <ContactSection />
       <NewsUpdates />
     </>
