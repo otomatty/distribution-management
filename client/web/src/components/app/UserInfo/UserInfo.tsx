@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useAtom } from "jotai";
+import { userAtom } from "@/atoms/userAtom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
@@ -8,16 +10,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User as UserType } from "@/types/user";
+import { useAuth } from "@/hooks/useAuth";
 
-interface UserInfoProps {
-  user: UserType;
-  onLogout: () => void;
-}
-
-const UserInfo: React.FC<UserInfoProps> = ({ user, onLogout }) => {
+const UserInfo: React.FC = () => {
+  const [userState] = useAtom(userAtom);
+  const { logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+
+  if (!userState.user) return null;
+
+  const user = userState.user;
   const fullName = `${user.family_name} ${user.given_name}`;
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("ログアウト中にエラーが発生しました:", error);
+      // ここでエラーメッセージを表示するなどのエラーハンドリングを行うことができます
+    }
+  };
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -35,13 +47,13 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, onLogout }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem asChild>
-          <Link to="/profile" className="flex items-center">
+          <Link to="/webapp/profile" className="flex items-center">
             <User className="mr-2 h-4 w-4" />
             <span>プロフィール</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={onLogout}
+          onClick={handleLogout}
           className="text-red-600 hover:text-red-700 hover:bg-red-100"
         >
           <LogOut className="mr-2 h-4 w-4" />

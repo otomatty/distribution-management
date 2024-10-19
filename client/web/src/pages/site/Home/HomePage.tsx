@@ -6,7 +6,7 @@ import UseCases from "./components/UseCases";
 import StatisticsAndBenefits from "./components/StatisticsAndBenefits";
 import Testimonials from "./components/Testimonials";
 import PlanComparison from "./components/PlanComparison";
-import Faq from "./components/Faq";
+import Faq from "./components/FAQ";
 import ContactSection from "./components/ContactSection";
 import NewsUpdates from "./components/NewsUpdates";
 

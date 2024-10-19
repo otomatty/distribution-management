@@ -1,18 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAtom } from "jotai";
+import { userAtom } from "@/atoms/userAtom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { authService } from "@/services/auth";
+import { User } from "@/types/user";
 
 const ProfilePage: React.FC = () => {
+  const [userState, setUserState] = useAtom(userAtom);
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
-    name: "山田太郎",
-    email: "yamada@example.com",
-    position: "在庫管理者",
-    department: "物流部",
-    bio: "10年以上の在庫管理経験があります。効率的な在庫管理システムの構築に興味があります。",
+  const [profile, setProfile] = useState<Partial<User>>({
+    family_name: "",
+    given_name: "",
+    email: "",
+    phone_number: "",
+    bio: "",
   });
+
+  useEffect(() => {
+    if (userState.user) {
+      setProfile({
+        family_name: userState.user.family_name || "",
+        given_name: userState.user.given_name || "",
+        email: userState.user.email || "",
+        phone_number: userState.user.phone_number || "",
+        bio: userState.user.bio || "",
+      });
+    }
+  }, [userState.user]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -21,11 +38,20 @@ const ProfilePage: React.FC = () => {
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    // ここでプロフィール情報を保存するAPIを呼び出す
-    console.log("保存されたプロフィール:", profile);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const updatedUser = await authService.updateUserProfile(profile);
+      setUserState((prev) => ({ ...prev, user: updatedUser }));
+      setIsEditing(false);
+    } catch (error) {
+      console.error("プロフィールの更新中にエラーが発生しました:", error);
+      // エラーメッセージを表示するなどのエラーハンドリングを行う
+    }
   };
+
+  if (!userState.user) {
+    return <div>ユーザー情報を読み込んでいます...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -34,10 +60,12 @@ const ProfilePage: React.FC = () => {
       <div className="flex items-center space-x-4 mb-6">
         <Avatar className="w-24 h-24">
           <AvatarImage
-            src="https://github.com/shadcn.png"
+            src={userState.user.avatar_url || "https://github.com/shadcn.png"}
             alt="プロフィール画像"
           />
-          <AvatarFallback>YT</AvatarFallback>
+          <AvatarFallback>{`${userState.user.family_name.charAt(
+            0
+          )}${userState.user.given_name.charAt(0)}`}</AvatarFallback>
         </Avatar>
         {!isEditing && (
           <Button onClick={() => setIsEditing(true)}>プロフィールを編集</Button>
@@ -46,12 +74,19 @@ const ProfilePage: React.FC = () => {
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            名前
-          </label>
+          <label className="block text-sm font-medium text-gray-700">姓</label>
           <Input
-            name="name"
-            value={profile.name}
+            name="family_name"
+            value={profile.family_name}
+            onChange={handleInputChange}
+            disabled={!isEditing}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">名</label>
+          <Input
+            name="given_name"
+            value={profile.given_name}
             onChange={handleInputChange}
             disabled={!isEditing}
           />
@@ -70,22 +105,11 @@ const ProfilePage: React.FC = () => {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            役職
+            電話番号
           </label>
           <Input
-            name="position"
-            value={profile.position}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            部署
-          </label>
-          <Input
-            name="department"
-            value={profile.department}
+            name="phone_number"
+            value={profile.phone_number}
             onChange={handleInputChange}
             disabled={!isEditing}
           />

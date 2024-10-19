@@ -11,10 +11,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { authService, AuthError } from "@/services/auth";
+import { authService, AuthError, AuthResult } from "@/services/auth";
 import { supabase } from "@/lib/supabase";
+import { useAtom } from "jotai";
+import { userAtom, UserState } from "@/atoms/userAtom";
 
 const SignupPage: React.FC = () => {
+  const [, setUser] = useAtom(userAtom);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [familyName, setFamilyName] = useState("");
@@ -27,8 +30,14 @@ const SignupPage: React.FC = () => {
         if (event === "SIGNED_IN") {
           if (session?.user) {
             try {
-              await authService.handleGoogleSignIn(session.user);
-              navigate("/dashboard");
+              const result: AuthResult = await authService.handleGoogleSignIn(
+                session.user
+              );
+              setUser({
+                user: result.user,
+                session: result.session,
+              } as UserState);
+              navigate("/webapp/home");
             } catch (error) {
               console.error("Google認証後のエラー:", error);
               alert("認証後の処理中にエラーが発生しました。");
@@ -41,16 +50,22 @@ const SignupPage: React.FC = () => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, setUser]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await authService.signupWithEmail(email, password, familyName, givenName);
+      const result: AuthResult = await authService.signupWithEmail(
+        email,
+        password,
+        familyName,
+        givenName
+      );
+      setUser({ user: result.user, session: result.session } as UserState);
       alert(
         "確認メールを送信しました。メールを確認してアカウントを有効化してください。"
       );
-      navigate("/login");
+      navigate("/webapp/home");
     } catch (error) {
       if (error instanceof AuthError) {
         alert(error.message);
@@ -64,7 +79,7 @@ const SignupPage: React.FC = () => {
     try {
       const { data, error } = await authService.loginWithGoogle();
       if (error) throw error;
-      if (data.url) {
+      if (data?.url) {
         window.location.href = data.url;
       } else {
         throw new Error("Google認証に失敗しました");

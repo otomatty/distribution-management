@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { User } from "@/types/user";
-import { User as AuthUser, OAuthResponse } from "@supabase/supabase-js";
+import { Session, User as SupabaseUser } from "@supabase/supabase-js";
 
 export class AuthError extends Error {
   constructor(message: string) {
@@ -9,15 +9,20 @@ export class AuthError extends Error {
   }
 }
 
+export interface AuthResult {
+  user: User | null;
+  session: Session | null;
+}
+
 export const authService = {
-  async loginWithEmail(email: string, password: string) {
+  async loginWithEmail(email: string, password: string): Promise<AuthResult> {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     if (error) throw new AuthError(error.message);
-    await this.fetchUserData(data.user.id);
-    return data;
+    const userData = await this.fetchUserData(data.user.id);
+    return { user: userData, session: data.session };
   },
 
   async signupWithEmail(
@@ -25,71 +30,38 @@ export const authService = {
     password: string,
     familyName: string,
     givenName: string
-  ) {
+  ): Promise<AuthResult> {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) throw new AuthError(error.message);
 
+    let userData: User | null = null;
     if (data.user) {
-      await this.createUserProfile(data.user.id, email, familyName, givenName);
-    }
-
-    return data;
-  },
-
-  async loginWithGoogle(): Promise<OAuthResponse> {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/signup`,
-      },
-    });
-    if (error) throw new AuthError(error.message);
-    return { data, error };
-  },
-
-  async handleGoogleSignIn(user: AuthUser) {
-    console.log("Full user object:", user);
-    console.log("User metadata:", user.user_metadata);
-
-    const { data, error } = await supabase
-      .from("users")
-      .select()
-      .eq("id", user.id)
-      .single();
-
-    if (error && error.code !== "PGRST116") {
-      console.error("Error fetching user data:", error);
-      throw new AuthError(error.message);
-    }
-
-    if (!data) {
-      console.log("Creating new user profile...");
-      let givenName = "";
-      let familyName = "";
-
-      if (user.user_metadata?.full_name) {
-        const nameParts = user.user_metadata.full_name.split(" ");
-        if (nameParts.length >= 2) {
-          // 最後の部分を苗字として扱い、残りを名前として扱う
-          familyName = nameParts.pop() || "";
-          givenName = nameParts.join(" ");
-        } else {
-          // 名前が1つの部分しかない場合、そのまま名前として扱う
-          givenName = user.user_metadata.full_name;
-        }
-      }
-
-      await this.createUserProfile(
-        user.id,
-        user.email ?? "",
+      userData = await this.createUserProfile(
+        data.user.id,
+        email,
         familyName,
         givenName
       );
-    } else {
-      console.log("User profile already exists:", data);
     }
 
-    return this.fetchUserData(user.id);
+    return { user: userData, session: data.session };
+  },
+
+  async handleGoogleSignIn(supabaseUser: SupabaseUser): Promise<AuthResult> {
+    let userData = await this.fetchUserData(supabaseUser.id);
+
+    if (!userData) {
+      userData = await this.createUserProfile(
+        supabaseUser.id,
+        supabaseUser.email || "",
+        supabaseUser.user_metadata.family_name || "",
+        supabaseUser.user_metadata.given_name || ""
+      );
+    }
+
+    const { data: sessionData } = await supabase.auth.getSession();
+
+    return { user: userData, session: sessionData.session };
   },
 
   async createUserProfile(
@@ -97,21 +69,39 @@ export const authService = {
     email: string,
     family_name: string,
     given_name: string
-  ) {
-    const { error } = await supabase
+  ): Promise<User> {
+    const { data, error } = await supabase
       .from("users")
       .insert({ id, email, family_name, given_name })
       .select()
       .single();
 
     if (error) throw new AuthError(error.message);
+    return data as User;
   },
 
-  async fetchUserData(id: string): Promise<User> {
+  async fetchUserData(id: string): Promise<User | null> {
     const { data, error } = await supabase
       .from("users")
       .select()
       .eq("id", id)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        return null;
+      }
+      throw new AuthError(error.message);
+    }
+    return data as User;
+  },
+
+  async updateUserProfile(profile: Partial<User>): Promise<User> {
+    const { data, error } = await supabase
+      .from("users")
+      .update(profile)
+      .eq("id", profile.id)
+      .select()
       .single();
 
     if (error) throw new AuthError(error.message);
@@ -123,7 +113,7 @@ export const authService = {
     if (error) throw new AuthError(error.message);
   },
 
-  async getCurrentUser() {
+  async getCurrentUser(): Promise<User | null> {
     const {
       data: { user },
       error,
@@ -133,5 +123,23 @@ export const authService = {
       return await this.fetchUserData(user.id);
     }
     return null;
+  },
+
+  async loginWithGoogle(): Promise<{
+    data: { url: string } | null;
+    error: Error | null;
+  }> {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      return { data: null, error };
+    }
+
+    return { data, error: null };
   },
 };

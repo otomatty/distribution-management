@@ -1,4 +1,10 @@
 import { atom } from "jotai";
-import { User } from "@/types/user";
+import { User as CustomUser } from "@/types/user";
+import { Session } from "@supabase/supabase-js";
 
-export const userAtom = atom<User | null>(null);
+export interface UserState {
+  user: CustomUser | null;
+  session: Session | null;
+}
+
+export const userAtom = atom<UserState>({ user: null, session: null });

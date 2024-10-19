@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
-import { userAtom } from "@/atoms/userAtom";
+import { userAtom, UserState } from "@/atoms/userAtom";
+import { authService } from "@/services/auth";
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -8,16 +9,8 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      // バックエンドAPIを呼び出してセッションを終了する
-      await fetch("/api/logout", { method: "POST" });
-
-      // ローカルストレージからユーザー認証情報を削除する
-      localStorage.removeItem("token");
-
-      // アプリケーションの状態をリセットする
-      setUser(null);
-
-      // ユーザーをログインページにリダイレクトする
+      await authService.logout();
+      setUser({ user: null, session: null } as UserState);
       navigate("/login");
     } catch (error) {
       console.error("ログアウト中にエラーが発生しました:", error);

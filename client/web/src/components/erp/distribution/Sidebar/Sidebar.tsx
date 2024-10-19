@@ -1,5 +1,5 @@
 import React from "react";
-import SidebarNavigation from "@/components/app/SidebarNavigation/SidebarNavigation";
+import SidebarNavigation from "@/components/erp/distribution/SidebarNavigation/SidebarNavigation";
 
 const Sidebar: React.FC = () => {
   return (

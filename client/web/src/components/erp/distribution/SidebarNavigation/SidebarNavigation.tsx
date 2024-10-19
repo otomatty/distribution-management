@@ -19,25 +19,25 @@ type NavigationItem = {
 };
 
 const businessItems: NavigationItem[] = [
-  { icon: Home, label: "ホーム", path: "/home" },
+  { icon: Home, label: "ホーム", path: "/webapp/home" },
   {
     icon: Briefcase,
     label: "在庫",
     path: "/inventory",
     subItems: [
-      { label: "在庫一覧", path: "/inventory/list" },
-      { label: "入出庫", path: "/inventory/movement" },
-      { label: "棚卸し", path: "/inventory/stocktaking" },
+      { label: "在庫一覧", path: "/webapp/inventory/list" },
+      { label: "入出庫", path: "/webapp/inventory/movement" },
+      { label: "棚卸し", path: "/webapp/inventory/stocktaking" },
     ],
   },
   {
     icon: Briefcase,
     label: "仕入",
-    path: "/purchasing",
+    path: "/webapp/purchasing",
     subItems: [
-      { label: "発注", path: "/purchasing/orders" },
-      { label: "納品", path: "/purchasing/deliveries" },
-      { label: "支払", path: "/purchasing/payments" },
+      { label: "発注", path: "/webapp/purchasing/orders" },
+      { label: "納品", path: "/webapp/purchasing/deliveries" },
+      { label: "支払", path: "/webapp/purchasing/payments" },
     ],
   },
   {
@@ -45,11 +45,11 @@ const businessItems: NavigationItem[] = [
     label: "販売",
     path: "/sales",
     subItems: [
-      { label: "受注", path: "/sales/orders" },
-      { label: "出荷", path: "/sales/shipments" },
-      { label: "請求", path: "/sales/invoices" },
-      { label: "入金", path: "/sales/payments" },
-      { label: "返品", path: "/sales/returns" },
+      { label: "受注", path: "/webapp/sales/orders" },
+      { label: "出荷", path: "/webapp/sales/shipments" },
+      { label: "請求", path: "/webapp/sales/invoices" },
+      { label: "入金", path: "/webapp/sales/payments" },
+      { label: "返品", path: "/webapp/sales/returns" },
     ],
   },
   {
@@ -67,15 +67,15 @@ const otherItems: NavigationItem[] = [
   {
     icon: Database,
     label: "マスタ",
-    path: "/master",
+    path: "/webapp/master",
     subItems: [
-      { label: "商品マスタ", path: "/master/products" },
-      { label: "取引先マスタ", path: "/master/partners" },
-      { label: "保管場所マスタ", path: "/master/locations" },
+      { label: "商品マスタ", path: "/webapp/master/products" },
+      { label: "取引先マスタ", path: "/webapp/master/partners" },
+      { label: "保管場所マスタ", path: "/webapp/master/locations" },
     ],
   },
-  { icon: BarChart, label: "レポート・分析", path: "/reports" },
-  { icon: Settings, label: "システム設定", path: "/settings" },
+  { icon: BarChart, label: "レポート・分析", path: "/webapp/reports" },
+  { icon: Settings, label: "システム設定", path: "/webapp/settings" },
 ];
 
 const SidebarNavigation: React.FC = () => {

@@ -1,25 +1,14 @@
-# クロスプラットフォームアプリケーションテンプレート
+# 統合型 ERP
 
-このプロジェクトは、Solid.js、Supabase、Hono on Cloudflare Workers、Tauri を使用したクロスプラットフォーム対応のアプリケーションテンプレートです。
+このプロジェクトは、React、Supabase、Hono on Cloudflare Workers、Tauri を使用したクロスプラットフォーム対応の統合型 ERP です。
 
 ## 技術スタック
 
-- フロントエンド: Solid.js
+- フロントエンド: React
 - バックエンド: Supabase, Hono on Cloudflare Workers
-- デスクトップアプリケーション: Tauri
+- クロスプラットフォーム: Tauri
 - データベース: Supabase
-- スタイリング: Kobalte, Vanilla Extract
-
-## セットアップ
-
-```bash
-# プロジェクトのクローン
-git clone https://github.com/otomatty/super-solid-edge.git
-cd super-solid-edge
-
-# 依存関係のインストール
-npm install
-```
+- スタイリング: TailwindCSS, Shadcn/UI
 
 ## 開発
 
